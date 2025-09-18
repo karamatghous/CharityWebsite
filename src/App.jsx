@@ -1,313 +1,439 @@
 import { useEffect, useRef, useState } from "react";
 import {
   HeartHandshake,
-  Stethoscope,
-  MapPin,
-  Pill,
-  Users,
   HandHeart,
-  Mail,
   Phone,
+  Mail,
+  MapPin,
   Building2,
-  CheckCircle2,
-  Sparkles,
-  Utensils,
-  Ambulance,
   Syringe,
-  Youtube,
+  Pill,
+  Utensils,
+  Stethoscope,
+  Users,
+  ExternalLink,
+  Newspaper,
+  CalendarDays,
+  Camera,
+  CreditCard,
+  PiggyBank,
+  ArrowRight,
 } from "lucide-react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 
-function CountUp({ to = 0, duration = 1200, suffix = "" }) {
-  const [val, setVal] = useState(0);
-  const startTime = useRef(null);
-  useEffect(() => {
-    let raf;
-    const animate = (t) => {
-      if (startTime.current === null) startTime.current = t;
-      const p = Math.min(1, (t - startTime.current) / duration);
-      const eased = 1 - Math.pow(1 - p, 3);
-      setVal(Math.floor(eased * to));
-      if (p < 1) raf = requestAnimationFrame(animate);
-    };
-    raf = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(raf);
-  }, [to, duration]);
-  return <span>{val.toLocaleString()}{suffix}</span>;
-}
+/* ---------- Org + Links (EDIT THESE) ---------- */
+const ORG = {
+  name: "Barakah In Kindness",                 // <- your charity name
+  tagline: "Providing support and relief to those in need.",
+  email: "hello@barakah.org",                  // <- your UK charity email
+  phone: "+44 20 1234 5678",                   // <- your UK contact number
+  charityNo: "Charity No. 1234567",            // <- your UK charity number
+  address: "London, United Kingdom",
+};
+const DONATE = {
+  paypal: "https://www.paypal.com/donate?hosted_button_id=YOUR_ID", // <- paste real link
+  stripe: "https://buy.stripe.com/test_abc123",                      // <- paste real link
+};
+const BANK = {
+  bankName: "Your Bank plc",
+  accountName: "Barakah In Kindness",
+  sortCode: "08-71-99",
+  accountNo: "12414064",
+  referenceNote: "Use your email as reference",
+};
 
-const Section = ({ children, className = "" }) => (
+/* ---------- Helpers ---------- */
+const Section = ({ id, children, className = "" }) => (
   <motion.section
+    id={id}
     initial={{ opacity: 0, y: 24 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true, amount: 0.2 }}
     transition={{ duration: 0.6 }}
-    className={className}
+    className={`scroll-mt-24 ${className}`}
   >
     {children}
   </motion.section>
 );
 
-export default function CharityLandingPage() {
-  const [email, setEmail] = useState("");
-  const [amount, setAmount] = useState("");
+const Card = ({ children, className = "" }) => (
+  <motion.div
+    whileHover={{ y: -3 }}
+    className={`rounded-2xl border bg-white/90 backdrop-blur p-5 shadow-sm hover:shadow-md transition ${className}`}
+  >
+    {children}
+  </motion.div>
+);
 
-  // Contact form refs (WhatsApp submit)
-  const nameRef = useRef(null);
-  const emailRef = useRef(null);
-  const msgRef = useRef(null);
-
-  const BRAND = {
-    name: "Chakswari Hospital",
-    phone: "+92 341 5334861",
-    phonePlain: "+923415334861",
-    whatsapp: "https://wa.me/923415334861",
-  };
-
-  const stats = [
-    { label: "Patients treated (pilot camps)", value: 3200, suffix: "+" },
-    { label: "Volunteer doctors", value: 45, suffix: "" },
-    { label: "Free medicines provided", value: 18000, suffix: "+" },
-    { label: "Target beds in first wing", value: 50, suffix: "" },
+/* ---------- App ---------- */
+export default function App() {
+  const actions = [
+    {
+      icon: <Building2 className="h-6 w-6 text-stone-700" />,
+      title: "Donate to Hospital",
+      desc: "Support construction and equipment for the Chakswari Hospital project.",
+      href: "#donate",
+    },
+    {
+      icon: <Stethoscope className="h-6 w-6 text-stone-700" />,
+      title: "Sponsor a Patient",
+      desc: "Cover surgery, diagnostics and recovery for someone in need.",
+      href: "#sponsorship",
+    },
+    {
+      icon: <Utensils className="h-6 w-6 text-stone-700" />,
+      title: "Feed Families",
+      desc: "Help provide monthly essentials to vulnerable families.",
+      href: "#projects",
+    },
+    {
+      icon: <Pill className="h-6 w-6 text-stone-700" />,
+      title: "Donate Medication",
+      desc: "Fund essential medicines for chronic and emergency patients.",
+      href: "#projects",
+    },
   ];
 
-  const values = [
-    { title: "Compassion", desc: "Treating every patient with kindness, empathy, and respect." },
-    { title: "Equity", desc: "Ensuring fair access to healthcare for all, with extra support for those in need." },
-    { title: "Service", desc: "Placing the health and well-being of our community above all else." },
-    { title: "Integrity", desc: "Acting with honesty, transparency, and accountability in every decision." },
-    { title: "Excellence", desc: "Striving for the highest standards in medical care and community service." },
+  const blog = [
+    {
+      title: "Free Medical Camp – Mirpur",
+      date: "24 Aug 2025",
+      excerpt: "Over 300 patients received checkups, medicines and referrals.",
+      image: "/media/camp-1.jpg", // replace with Sufyaan’s photo
+    },
+    {
+      title: "Ambulance Fund Reaches 60%",
+      date: "10 Aug 2025",
+      excerpt: "Thanks to our supporters, we’re close to funding a new ambulance.",
+      image: "/media/ambulance.jpg",
+    },
   ];
 
-  const { scrollYProgress } = useScroll();
-  const blobY = useTransform(scrollYProgress, [0, 1], [0, 300]);
-
-  const quickAmts = [5, 20, 50, 100];
-
-  const openWhatsAppWithForm = () => {
-    const name = nameRef.current?.value?.trim() || "";
-    const em = emailRef.current?.value?.trim() || "";
-    const msg = msgRef.current?.value?.trim() || "";
-    const text = `New enquiry from ${name || "(no name)"}%0AEmail: ${em || "(not provided)"}%0A%0AMessage:%0A${msg || "(empty)"}`;
-    const url = `${BRAND.whatsapp}?text=${text}`;
-    window.open(url, "_blank");
-  };
+  const gallery = [
+    { src: "/media/hospital-1.jpg", alt: "Hospital site" },
+    { src: "/media/clinic-1.jpg", alt: "Clinic day" },
+    { src: "/media/meds-1.jpg", alt: "Medicine packs" },
+    { src: "/media/food-1.jpg", alt: "Food distribution" },
+  ];
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-sky-50 via-white to-emerald-50 text-slate-800 selection:bg-emerald-200/60">
-      {/* Decorative blobs */}
-      <motion.div aria-hidden style={{ y: blobY }} className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-emerald-200/40 blur-3xl" />
-        <div className="absolute top-40 -right-40 h-96 w-96 rounded-full bg-sky-200/40 blur-3xl" />
-      </motion.div>
-
-      {/* Header */}
-      <header className="sticky top-0 z-40 border-b bg-white/80 backdrop-blur">
+    <div className="min-h-screen w-full bg-gradient-to-b from-stone-50 via-white to-amber-50 text-stone-800">
+      {/* NAV */}
+      <header className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <a href="#home" className="flex items-center gap-2 font-semibold">
-            <HeartHandshake className="h-6 w-6 text-emerald-600" /> {BRAND.name}
+            <HeartHandshake className="h-6 w-6 text-amber-700" />
+            <span className="tracking-tight">{ORG.name}</span>
           </a>
           <nav className="hidden md:flex items-center gap-6 text-sm">
-            {["Home","About","Vision & Mission","Free Services","Hospital Project","Donate","Contact"].map((l,i)=>(
-              <a key={i} href={`#${l.toLowerCase().replace(/ & /g,"-").replace(/ /g,"")}`} className="hover:text-slate-900">{l}</a>
-            ))}
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="#projects">Our Projects</a>
+            <a href="#getinvolved">Get Involved</a>
+            <a href="#organise">Organise Event</a>
+            <a href="#blog">Blog</a>
+            <a href="#donate">Donate</a>
+            <a href="#sponsorship">Sponsorship</a>
+            <a href="#contact">Contact</a>
           </nav>
           <div className="flex items-center gap-2">
-            <a href={BRAND.whatsapp} target="_blank" className="hidden sm:inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm shadow hover:shadow-md">
-              <Phone className="h-4 w-4" /> WhatsApp
-            </a>
-            <a href="#donate" className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 text-white px-4 py-2 text-sm shadow hover:shadow-md">
+            <a
+              href="#donate"
+              className="inline-flex items-center gap-2 rounded-full bg-amber-700 text-white px-4 py-2 text-sm font-semibold shadow hover:shadow-md active:scale-[0.98]"
+            >
               <HandHeart className="h-4 w-4" /> Donate
             </a>
           </div>
         </div>
       </header>
 
-      {/* Hero */}
-      <section id="home" className="relative py-16 lg:py-24">
+      {/* HERO */}
+      <Section id="home" className="py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 items-center">
           <div>
-            <h1 className="text-4xl md:text-5xl font-extrabold">Care for all, <span className="text-emerald-600">help for those in need</span></h1>
-            <p className="mt-6 text-lg">We provide free operations, medicines, meals, and ambulance service for those who cannot afford care.</p>
+            <div className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-amber-800 text-xs font-medium">
+              Compassion in action
+            </div>
+            <h1 className="mt-4 text-4xl md:text-5xl font-extrabold tracking-tight text-stone-900">
+              {ORG.name}
+            </h1>
+            <p className="mt-4 text-lg text-stone-700">{ORG.tagline}</p>
             <div className="mt-8 flex gap-3">
-              <a href="#donate" className="rounded-xl bg-gradient-to-r from-emerald-600 to-sky-600 text-white px-6 py-3 shadow">Donate Now</a>
-              <a href={BRAND.whatsapp} target="_blank" className="rounded-xl border px-6 py-3 shadow">WhatsApp Us</a>
-            </div>
-            <div className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {stats.map((s)=>(
-                <div key={s.label} className="rounded-xl border p-4 bg-white/70">
-                  <div className="text-2xl font-extrabold text-emerald-700"><CountUp to={s.value} suffix={s.suffix}/></div>
-                  <div className="text-xs text-slate-500 mt-1">{s.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="aspect-[4/3] rounded-3xl border shadow-xl flex items-center justify-center bg-gradient-to-br from-sky-50 to-emerald-100">
-            <Building2 className="h-16 w-16 text-emerald-700" />
-          </div>
-        </div>
-      </section>
-
-      {/* About */}
-      <Section id="about" className="py-16 bg-gradient-to-b from-white to-sky-50/60">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid lg:grid-cols-3 gap-10">
-          <div className="lg:col-span-2">
-            <h2 className="text-3xl font-extrabold">Who we are</h2>
-            <p className="mt-6">{BRAND.name} is a charity hospital offering free medical care. We believe healthcare is a right, not a privilege.</p>
-            <div className="mt-6 rounded-3xl overflow-hidden border shadow-sm">
-              <a href="https://youtu.be/K-1x3Hl4P9I" target="_blank" className="aspect-video relative flex items-center justify-center bg-gradient-to-br from-red-600 to-red-400 text-white group">
-                <Youtube className="h-16 w-16 group-hover:scale-110 transition-transform" />
-                <span className="absolute bottom-3 right-3 text-xs bg-white text-red-600 px-2 py-1 rounded-lg shadow">Watch on YouTube</span>
+              <a
+                href="#projects"
+                className="rounded-full bg-stone-900 text-white px-6 py-3 text-sm font-semibold shadow hover:shadow-lg active:scale-[0.98]"
+              >
+                Learn More
+              </a>
+              <a
+                href="#donate"
+                className="rounded-full border border-stone-300 bg-white px-6 py-3 text-sm font-semibold hover:shadow active:scale-[0.99]"
+              >
+                Donate
               </a>
             </div>
           </div>
-          <div className="rounded-3xl border p-6 bg-white/80">
-            <h3 className="font-semibold">What your gift can do</h3>
-            <ul className="mt-4 space-y-2 text-sm">
-              <li><CheckCircle2 className="inline h-4 w-4 text-emerald-600" /> Fund a life-saving operation</li>
-              <li><CheckCircle2 className="inline h-4 w-4 text-emerald-600" /> Provide essential medicines</li>
-              <li><CheckCircle2 className="inline h-4 w-4 text-emerald-600" /> Sponsor hot meals</li>
-              <li><CheckCircle2 className="inline h-4 w-4 text-emerald-600" /> Keep ambulances running</li>
+          <div className="rounded-3xl overflow-hidden border shadow bg-stone-100 aspect-[5/3] flex items-center justify-center">
+            {/* Replace with hero image/video from Sufyaan */}
+            <Camera className="h-12 w-12 text-stone-500" />
+          </div>
+        </div>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-10 grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+          {actions.map((a) => (
+            <Card key={a.title}>
+              <div className="flex items-start gap-3">
+                {a.icon}
+                <div>
+                  <div className="font-semibold">{a.title}</div>
+                  <p className="text-sm text-stone-600 mt-1">{a.desc}</p>
+                  <a href={a.href} className="mt-2 inline-flex items-center gap-1 text-amber-800 text-sm font-medium">
+                    Go <ArrowRight className="h-3.5 w-3.5" />
+                  </a>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </Section>
+
+      {/* ABOUT */}
+      <Section id="about" className="py-16 lg:py-24 bg-amber-50/50">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10">
+          <div>
+            <h2 className="text-3xl font-extrabold text-stone-900">About</h2>
+            <p className="mt-4 text-stone-700">
+              We’re a UK-registered charity ({ORG.charityNo}) focused on healthcare relief and poverty
+              alleviation. Our current flagship project is the **Chakswari Hospital**—a community-driven
+              facility offering free surgeries, medicines, and emergency support to the poor and vulnerable.
+            </p>
+            <ul className="mt-6 space-y-3 text-stone-700">
+              <li className="flex gap-2"><Stethoscope className="h-5 w-5 text-amber-700" /> Free operations & triage</li>
+              <li className="flex gap-2"><Pill className="h-5 w-5 text-amber-700" /> In-house essential medicines</li>
+              <li className="flex gap-2"><Users className="h-5 w-5 text-amber-700" /> Volunteer doctors & nurses</li>
             </ul>
+          </div>
+          <Card>
+            <div className="font-semibold">Contact (UK)</div>
+            <ul className="mt-3 text-sm space-y-2">
+              <li className="flex items-center gap-2"><Mail className="h-4 w-4" /> {ORG.email}</li>
+              <li className="flex items-center gap-2"><Phone className="h-4 w-4" /> {ORG.phone}</li>
+              <li className="flex items-center gap-2"><MapPin className="h-4 w-4" /> {ORG.address}</li>
+              <li className="flex items-center gap-2"><Newspaper className="h-4 w-4" /> {ORG.charityNo}</li>
+            </ul>
+          </Card>
+        </div>
+      </Section>
+
+      {/* PROJECTS */}
+      <Section id="projects" className="py-16 lg:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-extrabold text-stone-900">Our Projects</h2>
+          <p className="mt-3 text-stone-700 max-w-3xl">
+            We run ongoing and future initiatives across healthcare and family support.
+          </p>
+
+          <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <Card>
+              <div className="font-semibold">Chakswari Hospital (Current)</div>
+              <p className="text-sm text-stone-600 mt-1">Building a free community hospital in Pakistan.</p>
+              <a href="#donate" className="mt-3 inline-flex items-center gap-1 text-amber-800 text-sm font-medium">
+                Support this project <ArrowRight className="h-3.5 w-3.5" />
+              </a>
+            </Card>
+            <Card>
+              <div className="font-semibold">Ambulance & Medicines (Current)</div>
+              <p className="text-sm text-stone-600 mt-1">Funding emergency transport and essential drugs.</p>
+            </Card>
+            <Card>
+              <div className="font-semibold">Rural Clinics (Future)</div>
+              <p className="text-sm text-stone-600 mt-1">Weekly outreach clinics for remote villages.</p>
+            </Card>
           </div>
         </div>
       </Section>
 
-      {/* Vision & Mission */}
-      <Section id="vision" className="py-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10">
-          <div>
-            <h2 className="text-3xl font-extrabold">Vision</h2>
-            <p className="mt-4">A healthier, stronger rural community where everyone has access to medical care and support.</p>
-            <h2 className="mt-10 text-3xl font-extrabold">Mission</h2>
-            <p className="mt-4">To provide free access to qualified doctors and medication for those in need, with compassion and excellence.</p>
+      {/* GET INVOLVED */}
+      <Section id="getinvolved" className="py-16 lg:py-24 bg-amber-50/50">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-8">
+          <Card>
+            <div className="flex items-center gap-3">
+              <Users className="h-5 w-5 text-amber-700" />
+              <div className="font-semibold">Volunteer with us</div>
+            </div>
+            <p className="mt-2 text-sm text-stone-600">
+              Doctors, nurses, coordinators—apply to join our programmes.
+            </p>
+            <a
+              href="https://forms.gle/your-volunteer-form"
+              target="_blank"
+              className="mt-4 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm hover:shadow"
+            >
+              Apply now <ExternalLink className="h-4 w-4" />
+            </a>
+          </Card>
+
+          <Card>
+            <div className="flex items-center gap-3">
+              <CalendarDays className="h-5 w-5 text-amber-700" />
+              <div className="font-semibold">Organise an Event</div>
+            </div>
+            <p className="mt-2 text-sm text-stone-600">
+              Host a fundraiser at your school, workplace, or community centre.
+              Email <b>{ORG.email}</b> for a starter pack and support.
+            </p>
+          </Card>
+        </div>
+      </Section>
+
+      {/* BLOG */}
+      <Section id="blog" className="py-16 lg:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-extrabold text-stone-900">Blog & Updates</h2>
+          <p className="mt-3 text-stone-700">Stories from the field and upcoming events.</p>
+          <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {blog.map((p) => (
+              <Card key={p.title} className="p-0 overflow-hidden">
+                <div className="aspect-[4/3] bg-stone-100">
+                  {/* Put Sufyaan’s image in /public/media and update p.image path */}
+                  <img src={p.image} alt={p.title} className="h-full w-full object-cover" />
+                </div>
+                <div className="p-5">
+                  <div className="text-xs text-stone-500">{p.date}</div>
+                  <div className="font-semibold mt-1">{p.title}</div>
+                  <p className="text-sm text-stone-600 mt-1">{p.excerpt}</p>
+                </div>
+              </Card>
+            ))}
           </div>
-          <div>
-            <h3 className="text-3xl font-extrabold">Values</h3>
-            <div className="mt-6 grid sm:grid-cols-2 gap-4">
-              {values.map((v)=>(
-                <div key={v.title} className="rounded-2xl border p-4 bg-white/70">
-                  <div className="font-semibold text-emerald-700">{v.title}</div>
-                  <div className="text-sm mt-1">{v.desc}</div>
+        </div>
+      </Section>
+
+      {/* DONATE (with working links) */}
+      <Section id="donate" className="py-16 lg:py-24 bg-amber-50/50">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid lg:grid-cols-3 gap-8 items-start">
+          <div className="lg:col-span-2">
+            <h2 className="text-3xl font-extrabold text-stone-900">Donate</h2>
+            <p className="mt-3 text-stone-700">
+              Your generosity funds our hospital build, medicines, ambulance and family support.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <a
+                href={DONATE.stripe}
+                target="_blank"
+                className="inline-flex items-center gap-2 rounded-full bg-stone-900 text-white px-6 py-3 text-sm font-semibold shadow hover:shadow-lg"
+              >
+                <CreditCard className="h-4 w-4" /> Donate with Card (Stripe)
+              </a>
+              <a
+                href={DONATE.paypal}
+                target="_blank"
+                className="inline-flex items-center gap-2 rounded-full border px-6 py-3 text-sm font-semibold hover:shadow"
+              >
+                <PiggyBank className="h-4 w-4" /> Donate with PayPal
+              </a>
+              <a
+                href="#bank"
+                className="inline-flex items-center gap-2 rounded-full border px-6 py-3 text-sm font-semibold hover:shadow"
+              >
+                Bank Transfer Details
+              </a>
+            </div>
+          </div>
+
+          {/* Quick media/Gallery */}
+          <Card>
+            <div className="font-semibold flex items-center gap-2">
+              <Camera className="h-4 w-4" /> Photos & Videos
+            </div>
+            <div className="mt-3 grid grid-cols-4 gap-2">
+              {gallery.slice(0, 4).map((g) => (
+                <div key={g.src} className="aspect-square overflow-hidden rounded-lg bg-stone-100">
+                  <img src={g.src} alt={g.alt} className="h-full w-full object-cover" />
                 </div>
               ))}
             </div>
-            <div className="mt-6 border p-4 bg-emerald-50 rounded-xl">Motto: “Care for all, help for those in need.”</div>
+            <a href="#blog" className="mt-4 inline-flex items-center gap-1 text-amber-800 text-sm font-medium">
+              See more updates <ArrowRight className="h-3.5 w-3.5" />
+            </a>
+          </Card>
+        </div>
+      </Section>
+
+      {/* SPONSORSHIP */}
+      <Section id="sponsorship" className="py-16 lg:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-8">
+          <Card>
+            <div className="font-semibold">Sponsor a Patient</div>
+            <p className="text-sm text-stone-600 mt-1">
+              Fund surgery, diagnostics and recovery for a specific individual.
+              Email <b>{ORG.email}</b> to be matched and receive updates.
+            </p>
+          </Card>
+          <Card>
+            <div className="font-semibold">Sponsor Hospital Equipment</div>
+            <p className="text-sm text-stone-600 mt-1">
+              From beds to monitors—choose an item to sponsor and we’ll recognise your gift.
+            </p>
+          </Card>
+        </div>
+      </Section>
+
+      {/* BANK DETAILS PAGELET */}
+      <Section id="bank" className="py-16 lg:py-24 bg-amber-50/50">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-extrabold text-stone-900">Bank Transfer</h2>
+          <p className="mt-3 text-stone-700">Please use the details below to donate by bank transfer:</p>
+          <div className="mt-6 grid sm:grid-cols-2 gap-4">
+            <Card><div className="text-xs text-stone-500">Account Name</div><div className="font-semibold">{BANK.accountName}</div></Card>
+            <Card><div className="text-xs text-stone-500">Bank</div><div className="font-semibold">{BANK.bankName}</div></Card>
+            <Card><div className="text-xs text-stone-500">Sort Code</div><div className="font-semibold">{BANK.sortCode}</div></Card>
+            <Card><div className="text-xs text-stone-500">Account Number</div><div className="font-semibold">{BANK.accountNo}</div></Card>
+          </div>
+          <div className="mt-4 text-sm text-stone-600">
+            Reference: <b>{BANK.referenceNote}</b>
           </div>
         </div>
       </Section>
 
-      {/* Services */}
-      <Section id="freeServices" className="py-16 bg-gradient-to-b from-emerald-50 to-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-extrabold">Our Free Services</h2>
-          <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-4 gap-5">
-            <div className="rounded-2xl border p-5 bg-white shadow-sm"><Syringe className="h-5 w-5" /> Free Operations</div>
-            <div className="rounded-2xl border p-5 bg-white shadow-sm"><Pill className="h-5 w-5" /> Free Medicines</div>
-            <div className="rounded-2xl border p-5 bg-white shadow-sm"><Utensils className="h-5 w-5" /> Free Meals</div>
-            <div className="rounded-2xl border p-5 bg-white shadow-sm"><Ambulance className="h-5 w-5" /> Free Ambulance</div>
-          </div>
-        </div>
-      </Section>
-
-      {/* Hospital */}
-      <Section id="hospitalproject" className="py-16 bg-gradient-to-b from-sky-50 to-emerald-50">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10">
-          <div>
-            <h2 className="text-3xl font-extrabold">Building the Hospital</h2>
-            <p className="mt-4">We are building a hospital in Chakswari to deliver free healthcare. Phase 1 includes OPD, Pharmacy, Lab, and 50-bed ward.</p>
-            <ul className="mt-6 space-y-2 text-slate-700 text-sm">
-              <li className="flex gap-2"><Users className="h-5 w-5" /> Daily OPD capacity: 250 patients</li>
-              <li className="flex gap-2"><Stethoscope className="h-5 w-5" /> 24/7 emergency & triage</li>
-              <li className="flex gap-2"><Pill className="h-5 w-5" /> In-house free pharmacy</li>
-              <li className="flex gap-2"><Building2 className="h-5 w-5" /> Phase 1: OPD, Ward, Lab, Pharmacy</li>
-            </ul>
-          </div>
-          <div className="rounded-3xl border shadow overflow-hidden">
-            <div className="aspect-[4/3]">
-              <iframe className="h-full w-full" src="https://www.openstreetmap.org/export/embed.html?bbox=73.68%2C33.10%2C73.81%2C33.18&layer=mapnik&marker=33.14%2C73.74"></iframe>
-            </div>
-            <div className="p-4 border-t flex justify-between items-center text-sm">
-              <div className="flex items-center gap-2"><MapPin className="h-4 w-4" /> Chakswari, Pakistan</div>
-              <a href="https://maps.google.com/?q=Chakswari,+Azad+Kashmir" target="_blank" className="text-xs border px-2 py-1 rounded">Open in Google Maps</a>
-            </div>
-          </div>
-        </div>
-      </Section>
-
-      {/* Donate */}
-      <Section id="donate" className="py-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <h2 className="text-3xl font-extrabold">Make a Donation</h2>
-            <form className="mt-6 grid gap-4 border p-6 rounded-3xl bg-white/80">
-              <div className="flex gap-2 flex-wrap">
-                {[5,20,50,100].map((amt)=>(
-                  <button key={amt} type="button" onClick={()=>setAmount(String(amt))} className={`px-4 py-2 rounded-xl border ${amount==String(amt)?"bg-emerald-600 text-white":"bg-white"}`}>${amt}</button>
-                ))}
-              </div>
-              <input type="number" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="Custom amount" className="rounded-xl border px-3 py-2" />
-              <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email for receipt" className="rounded-xl border px-3 py-2" />
-              <button type="button" className="rounded-xl bg-emerald-600 text-white px-6 py-3">Proceed to Payment (placeholder)</button>
-            </form>
-          </div>
-          <div className="rounded-3xl border p-6 bg-white">
-            <h3 className="font-semibold">Contact for Bank Transfer</h3>
-            <p className="mt-2 text-sm">Call or WhatsApp us for verified account details.</p>
-            <p className="mt-2"><Phone className="h-4 w-4 inline" /> {BRAND.phone}</p>
-          </div>
-        </div>
-      </Section>
-
-      {/* Contact */}
-      <Section id="contact" className="py-16">
+      {/* CONTACT */}
+      <Section id="contact" className="py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 items-start">
           <div>
-            <h2 className="text-3xl font-extrabold">Contact</h2>
-            <p className="mt-4">Have questions, need help, or want to partner? Send a message and we’ll get back to you.</p>
-            <form className="mt-6 rounded-3xl border p-6 bg-white/80 grid gap-4" onSubmit={(e)=>{e.preventDefault(); openWhatsAppWithForm();}}>
-              <div>
-                <label className="block text-sm font-medium">Name</label>
-                <input ref={nameRef} type="text" className="mt-2 w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-300" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">Email</label>
-                <input ref={emailRef} type="email" className="mt-2 w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 focus:ring-sky-300" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium">Message</label>
-                <textarea ref={msgRef} rows={4} className="mt-2 w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-300" />
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <a href={`tel:${BRAND.phonePlain}`} className="rounded-xl border px-4 py-2 text-sm hover:shadow">Call us</a>
-                <a href={BRAND.whatsapp} target="_blank" className="rounded-xl border px-4 py-2 text-sm hover:shadow">WhatsApp</a>
-              </div>
-              <button type="submit" className="rounded-2xl bg-gradient-to-r from-emerald-600 to-sky-600 text-white px-6 py-3 font-semibold shadow hover:shadow-lg">Send via WhatsApp</button>
-            </form>
-          </div>
-          <div className="rounded-3xl border p-6 bg-gradient-to-b from-white to-slate-50">
-            <h3 className="font-semibold">Reach us</h3>
-            <ul className="mt-4 space-y-2 text-sm">
-              <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-slate-700" /> info@chakswarihospital.org</li>
-              <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-slate-700" /> <a href={`tel:${BRAND.phonePlain}`} className="hover:underline">{BRAND.phone}</a></li>
-              <li className="flex items-center gap-2"><MapPin className="h-4 w-4 text-slate-700" /> Chakswari, Pakistan</li>
-            </ul>
-            <div className="mt-6 rounded-2xl border bg-white p-4 text-sm">
-              <p className="font-medium">Transparency</p>
-              <p className="text-slate-600 mt-1">We publish impact updates and can share usage reports with donors.</p>
+            <h2 className="text-3xl font-extrabold text-stone-900">Contact</h2>
+            <p className="mt-4 text-stone-700">
+              We’d love to hear from you. For partnerships, media or general enquiries, reach out below.
+            </p>
+            <div className="mt-6 grid gap-3">
+              <a href={`mailto:${ORG.email}`} className="inline-flex items-center gap-2 rounded-full border px-5 py-3 text-sm hover:shadow">
+                <Mail className="h-4 w-4" /> {ORG.email}
+              </a>
+              <a href={`tel:${ORG.phone.replace(/\s+/g, "")}`} className="inline-flex items-center gap-2 rounded-full border px-5 py-3 text-sm hover:shadow">
+                <Phone className="h-4 w-4" /> {ORG.phone}
+              </a>
             </div>
           </div>
+          <Card>
+            <div className="font-semibold">Newsletter</div>
+            <p className="text-sm text-stone-600 mt-1">Subscribe for updates and impact stories.</p>
+            {/* Wire this to your provider (Mailchimp/ConvertKit/etc.) */}
+            <form className="mt-4 flex gap-2">
+              <input type="email" placeholder="Email address" className="w-full rounded-xl border px-3 py-2 outline-none focus:ring-2 focus:ring-amber-300" />
+              <button type="button" className="rounded-xl bg-stone-900 text-white px-4 py-2 text-sm">Subscribe</button>
+            </form>
+          </Card>
         </div>
       </Section>
 
-      {/* Footer */}
-      <footer className="border-t bg-white/70 backdrop-blur">
+      {/* FOOTER */}
+      <footer className="border-t bg-white/70">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-sm">
-            <HeartHandshake className="h-4 w-4 text-emerald-700" />
-            <span>{BRAND.name} — Pakistan</span>
+            <HeartHandshake className="h-4 w-4 text-amber-700" />
+            <span>{ORG.name}</span>
           </div>
-          <div className="text-xs text-slate-500">© {new Date().getFullYear()} All rights reserved.</div>
+          <div className="text-xs text-stone-500">
+            © {new Date().getFullYear()} {ORG.name}. {ORG.charityNo}
+          </div>
         </div>
       </footer>
     </div>
