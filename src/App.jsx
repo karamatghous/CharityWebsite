@@ -23,16 +23,16 @@ import { motion, useScroll, useTransform } from "framer-motion";
 
 /* ---------- Org + Links (EDIT THESE) ---------- */
 const ORG = {
-  name: "Barakah In Kindness",                  // Charity name
+  name: "Barakah In Kindness",
   tagline: "Providing support and relief to those in need.",
-  email: "hello@barakah.org",                   // UK email
-  phone: "+44 20 1234 5678",                    // UK phone
-  charityNo: "Charity No. 1234567",             // UK charity number
+  email: "hello@barakah.org",
+  phone: "+44 20 1234 5678",
+  charityNo: "Charity No. 1234567",
   address: "London, United Kingdom",
 };
 const DONATE = {
-  paypal: "https://www.paypal.com/donate?hosted_button_id=YOUR_ID", // real link here
-  stripe: "https://buy.stripe.com/test_abc123",                     // real link here
+  paypal: "https://www.paypal.com/donate?hosted_button_id=YOUR_ID", // replace
+  stripe: "https://buy.stripe.com/test_abc123",                     // replace
 };
 const BANK = {
   bankName: "Your Bank plc",
@@ -42,7 +42,7 @@ const BANK = {
   referenceNote: "Use your email as reference",
 };
 
-/* ---------- Small helpers ---------- */
+/* ---------- Helpers ---------- */
 function CountUp({ to = 0, duration = 1200, suffix = "" }) {
   const [val, setVal] = useState(0);
   const startRef = useRef(null);
@@ -90,11 +90,11 @@ const Card = ({ children, className = "" }) => (
 
 /* ---------- App ---------- */
 export default function App() {
-  // floating blobs & parallax
+  // floating blobs
   const { scrollYProgress } = useScroll();
   const blobY = useTransform(scrollYProgress, [0, 1], [0, 250]);
 
-  // hero stats (animated)
+  // stats
   const stats = [
     { label: "Patients helped", value: 3200, suffix: "+" },
     { label: "Volunteer doctors", value: 45, suffix: "" },
@@ -102,7 +102,7 @@ export default function App() {
     { label: "Target beds (Phase 1)", value: 50, suffix: "" },
   ];
 
-  // actions under hero
+  // action cards
   const actions = [
     {
       icon: <Building2 className="h-6 w-6 text-stone-700" />,
@@ -130,31 +130,43 @@ export default function App() {
     },
   ];
 
-  // blog & gallery placeholders (drop Sufyaan’s media in /public/media/)
+  // BLOG (replace images with your real files in /public/media/)
   const blog = [
     {
-      title: "Free Medical Camp – Mirpur",
-      date: "24 Aug 2025",
-      excerpt: "Over 300 patients received checkups, medicines and referrals.",
-      image: "/media/camp-1.jpg",
+      title: "Hospital Construction Progress",
+      date: "15 Sep 2025",
+      excerpt:
+        "The foundation and first floor walls have been completed. Next step: roofing and utilities.",
+      image: "/media/hospital-progress.jpg",
     },
     {
-      title: "Ambulance Fund Reaches 60%",
-      date: "10 Aug 2025",
-      excerpt: "We’re close to funding a new ambulance—thank you!",
-      image: "/media/ambulance.jpg",
+      title: "Food Distribution Drive",
+      date: "05 Sep 2025",
+      excerpt:
+        "Over 150 families received essential food packs in the local community—thank you to all donors.",
+      image: "/media/food-drive.jpg",
+    },
+    {
+      title: "Free Eye Camp",
+      date: "20 Aug 2025",
+      excerpt:
+        "Volunteer doctors provided checkups and distributed 200+ pairs of glasses to patients.",
+      image: "/media/eye-camp.jpg",
     },
   ];
+
+  // GALLERY (thumbnails)
   const gallery = [
-    { src: "/media/hospital-1.jpg", alt: "Hospital site" },
-    { src: "/media/clinic-1.jpg", alt: "Clinic day" },
-    { src: "/media/meds-1.jpg", alt: "Medicine packs" },
-    { src: "/media/food-1.jpg", alt: "Food distribution" },
+    { src: "/media/hospital-site.jpg", alt: "Hospital construction site" },
+    { src: "/media/medical-camp.jpg", alt: "Medical camp with patients" },
+    { src: "/media/ambulance-service.jpg", alt: "Ambulance service in action" },
+    { src: "/media/food-aid.jpg", alt: "Volunteers distributing food packs" },
+    { src: "/media/team-volunteers.jpg", alt: "Volunteer team group photo" },
   ];
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-stone-50 via-white to-amber-50 text-stone-800">
-      {/* Decorative gradient blobs (parallax) */}
+      {/* Decorative gradient blobs */}
       <motion.div aria-hidden style={{ y: blobY }} className="pointer-events-none fixed inset-0 -z-10">
         <div className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-amber-200/40 blur-3xl" />
         <div className="absolute top-40 -right-40 h-96 w-96 rounded-full bg-stone-200/40 blur-3xl" />
@@ -167,7 +179,7 @@ export default function App() {
             <HeartHandshake className="h-6 w-6 text-amber-700" />
             <span className="tracking-tight">{ORG.name}</span>
           </a>
-          <nav className="hidden md:flex items-center gap-6 text-sm">
+        <nav className="hidden md:flex items-center gap-6 text-sm">
             <a href="#home">Home</a>
             <a href="#about">About</a>
             <a href="#projects">Our Projects</a>
@@ -232,9 +244,14 @@ export default function App() {
             </div>
           </div>
 
-          {/* Hero media (replace with Sufyaan’s image/video) */}
-          <div className="rounded-3xl overflow-hidden border shadow bg-stone-100 aspect-[5/3] flex items-center justify-center">
-            <Camera className="h-12 w-12 text-stone-500" />
+          {/* Hero image (replace with your real file in /public/media/) */}
+          <div className="rounded-3xl overflow-hidden border shadow bg-stone-100 aspect-[5/3]">
+            <img
+              src="/media/hospital-hero.jpg"
+              alt="Chakswari Hospital project"
+              className="h-full w-full object-cover"
+              loading="eager"
+            />
           </div>
         </div>
 
