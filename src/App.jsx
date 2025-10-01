@@ -6,7 +6,6 @@ import {
   Mail,
   MapPin,
   Building2,
-  Syringe,
   Pill,
   Utensils,
   Stethoscope,
@@ -14,10 +13,11 @@ import {
   ExternalLink,
   Newspaper,
   CalendarDays,
-  Camera,
   CreditCard,
   PiggyBank,
   ArrowRight,
+  CheckCircle2,
+  BadgePercent,
 } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
@@ -25,14 +25,14 @@ import { motion, useScroll, useTransform } from "framer-motion";
 const ORG = {
   name: "Barakah In Kindness",
   tagline: "Providing support and relief to those in need.",
-  email: "hello@barakah.org",
-  phone: "+44 20 1234 5678",
-  charityNo: "Charity No. 1234567",
+  email: "hello@barakah.org",            // ← replace with your email
+  phone: "+44 20 1234 5678",             // ← replace with your UK number
+  charityNo: "Charity No. 1234567",      // ← replace with your real UK charity no.
   address: "London, United Kingdom",
 };
 const DONATE = {
-  paypal: "https://www.paypal.com/donate?hosted_button_id=YOUR_ID", // replace
-  stripe: "https://buy.stripe.com/test_abc123",                     // replace
+  paypal: "https://www.paypal.com/donate?hosted_button_id=YOUR_ID", // ← replace
+  stripe: "https://buy.stripe.com/test_abc123",                     // ← replace
 };
 const BANK = {
   bankName: "Your Bank plc",
@@ -42,7 +42,7 @@ const BANK = {
   referenceNote: "Use your email as reference",
 };
 
-/* ---------- Helpers ---------- */
+/* ---------- Small helpers ---------- */
 function CountUp({ to = 0, duration = 1200, suffix = "" }) {
   const [val, setVal] = useState(0);
   const startRef = useRef(null);
@@ -130,39 +130,33 @@ export default function App() {
     },
   ];
 
-  // BLOG (replace images with your real files in /public/media/)
+  // BLOG — text-only cards now (no images)
   const blog = [
     {
-      title: "Hospital Construction Progress",
-      date: "15 Sep 2025",
+      title: "Free Medical Camp – Mirpur",
+      date: "24 Aug 2025",
       excerpt:
-        "The foundation and first floor walls have been completed. Next step: roofing and utilities.",
-      image: "/media/hospital-progress.jpg",
+        "Over 300 patients received checkups, medicines, and referrals thanks to our volunteers.",
+      tag: "Medical Camp",
     },
     {
       title: "Food Distribution Drive",
-      date: "05 Sep 2025",
+      date: "12 Sep 2025",
       excerpt:
-        "Over 150 families received essential food packs in the local community—thank you to all donors.",
-      image: "/media/food-drive.jpg",
+        "Hundreds of families received essential food supplies across rural areas.",
+      tag: "Relief",
     },
     {
-      title: "Free Eye Camp",
-      date: "20 Aug 2025",
+      title: "Hospital Construction Progress",
+      date: "20 Sep 2025",
       excerpt:
-        "Volunteer doctors provided checkups and distributed 200+ pairs of glasses to patients.",
-      image: "/media/eye-camp.jpg",
+        "Phase 1 is underway with OPD and a 50-bed ward planned in the first wing.",
+      tag: "Project Update",
     },
   ];
 
-  // GALLERY (thumbnails)
-  const gallery = [
-    { src: "/media/hospital-site.jpg", alt: "Hospital construction site" },
-    { src: "/media/medical-camp.jpg", alt: "Medical camp with patients" },
-    { src: "/media/ambulance-service.jpg", alt: "Ambulance service in action" },
-    { src: "/media/food-aid.jpg", alt: "Volunteers distributing food packs" },
-    { src: "/media/team-volunteers.jpg", alt: "Volunteer team group photo" },
-  ];
+  // gallery removed from Donate card since brief didn’t ask to change it here
+  const gallery = [];
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-stone-50 via-white to-amber-50 text-stone-800">
@@ -179,7 +173,7 @@ export default function App() {
             <HeartHandshake className="h-6 w-6 text-amber-700" />
             <span className="tracking-tight">{ORG.name}</span>
           </a>
-        <nav className="hidden md:flex items-center gap-6 text-sm">
+          <nav className="hidden md:flex items-center gap-6 text-sm">
             <a href="#home">Home</a>
             <a href="#about">About</a>
             <a href="#projects">Our Projects</a>
@@ -201,7 +195,7 @@ export default function App() {
         </div>
       </header>
 
-      {/* HERO */}
+      {/* HERO (image removed; replaced with a highlights card) */}
       <Section id="home" className="py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10 items-center">
           <div>
@@ -244,15 +238,24 @@ export default function App() {
             </div>
           </div>
 
-          {/* Hero image (replace with your real file in /public/media/) */}
-          <div className="rounded-3xl overflow-hidden border shadow bg-stone-100 aspect-[5/3]">
-            <img
-              src="/media/hospital-hero.jpg"
-              alt="Chakswari Hospital project"
-              className="h-full w-full object-cover"
-              loading="eager"
-            />
-          </div>
+          {/* Right side: good-looking card instead of image */}
+          <Card className="lg:ml-auto">
+            <div className="flex items-center gap-2 text-amber-800 font-semibold">
+              <CheckCircle2 className="h-5 w-5" />
+              Project Highlights
+            </div>
+            <ul className="mt-4 space-y-3 text-sm text-stone-700">
+              <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-amber-700 mt-0.5" /> Chakswari Hospital Phase 1: OPD, Pharmacy, Lab, 50-bed ward</li>
+              <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-amber-700 mt-0.5" /> Free operations, medicines, meals & ambulance for the needy</li>
+              <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-amber-700 mt-0.5" /> Volunteer doctors and UK-based governance</li>
+              <li className="flex gap-2"><BadgePercent className="h-4 w-4 text-amber-700 mt-0.5" /> 100% transparency: UK charity — {ORG.charityNo}</li>
+            </ul>
+            <div className="mt-5">
+              <a href="#donate" className="inline-flex items-center gap-2 rounded-full bg-amber-700 text-white px-4 py-2 text-sm font-semibold shadow hover:shadow-md">
+                <HandHeart className="h-4 w-4" /> Donate now
+              </a>
+            </div>
+          </Card>
         </div>
 
         {/* Action cards */}
@@ -363,29 +366,33 @@ export default function App() {
         </div>
       </Section>
 
-      {/* BLOG */}
-      <Section id="blog" className="py-16 lg:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      {/* BLOG & UPDATES — text-only cards (no images) */}
+      <Section id="blog" className="py-24 bg-slate-50">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-extrabold text-stone-900">Blog & Updates</h2>
-          <p className="mt-3 text-stone-700">Stories from the field and upcoming events.</p>
-          <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <p className="mt-2 text-stone-700">Stories from the field and upcoming events.</p>
+
+          <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {blog.map((p) => (
-              <Card key={p.title} className="p-0 overflow-hidden">
-                <div className="aspect-[4/3] bg-stone-100">
-                  <img src={p.image} alt={p.title} className="h-full w-full object-cover" />
+              <Card key={p.title} className="text-left">
+                <div className="flex items-center gap-2 text-xs text-stone-500">
+                  <Newspaper className="h-4 w-4" />
+                  <span>{p.date}</span>
+                  <span className="mx-2">•</span>
+                  <span className="rounded-full bg-amber-100 text-amber-900 px-2 py-0.5">{p.tag}</span>
                 </div>
-                <div className="p-5">
-                  <div className="text-xs text-stone-500">{p.date}</div>
-                  <div className="font-semibold mt-1">{p.title}</div>
-                  <p className="text-sm text-stone-600 mt-1">{p.excerpt}</p>
-                </div>
+                <div className="mt-2 font-semibold text-stone-900">{p.title}</div>
+                <p className="mt-1 text-sm text-stone-600">{p.excerpt}</p>
+                <a href="#contact" className="mt-3 inline-flex items-center gap-1 text-amber-800 text-sm font-medium">
+                  Ask about this update <ArrowRight className="h-3.5 w-3.5" />
+                </a>
               </Card>
             ))}
           </div>
         </div>
       </Section>
 
-      {/* DONATE (live links + gallery) */}
+      {/* DONATE (links; gallery removed) */}
       <Section id="donate" className="py-16 lg:py-24 bg-amber-50/50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid lg:grid-cols-3 gap-8 items-start">
           <div className="lg:col-span-2">
@@ -418,19 +425,11 @@ export default function App() {
           </div>
 
           <Card>
-            <div className="font-semibold flex items-center gap-2">
-              <Camera className="h-4 w-4" /> Photos & Videos
-            </div>
-            <div className="mt-3 grid grid-cols-4 gap-2">
-              {gallery.slice(0, 4).map((g) => (
-                <div key={g.src} className="aspect-square overflow-hidden rounded-lg bg-stone-100">
-                  <img src={g.src} alt={g.alt} className="h-full w-full object-cover" />
-                </div>
-              ))}
-            </div>
-            <a href="#blog" className="mt-4 inline-flex items-center gap-1 text-amber-800 text-sm font-medium">
-              See more updates <ArrowRight className="h-3.5 w-3.5" />
-            </a>
+            <div className="font-semibold">Gift Aid & Matching</div>
+            <p className="text-sm text-stone-600 mt-1">
+              If you’re a UK taxpayer, consider Gift Aid to increase your donation at no extra cost.
+              Many employers also offer donation matching—ask your HR.
+            </p>
           </Card>
         </div>
       </Section>
